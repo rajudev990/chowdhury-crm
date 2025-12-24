@@ -458,6 +458,25 @@
     @endif
 
 
+    <script>
+        function openProfileSidebar() {
+            const sidebar = document.getElementById('profileSidebar');
+            if (sidebar) {
+                sidebar.classList.remove('translate-x-full');
+            }
+        }
+
+        function closeProfileSidebar() {
+            document.getElementById('profileSidebar')
+                .classList.add('translate-x-full');
+        }
+
+        function previewProfileImage(event) {
+            document.getElementById('previewImage').src =
+                URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+
 
 
     @yield('js')
