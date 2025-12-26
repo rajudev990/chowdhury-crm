@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title','Dashboard')
-    
+
 @section('content')
 <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
     Welcome to Dashboard

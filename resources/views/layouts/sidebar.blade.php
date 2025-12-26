@@ -30,13 +30,13 @@
     <!-- Navigation Links -->
     <nav class="py-4">
         <!-- Dashboard - Active State -->
-        <a href="#" class="flex items-center px-6 py-3 bg-primary text-white">
+        <a href="/" class="flex items-center px-6 py-3 bg-primary text-white">
             <i class="fas fa-th-large w-6"></i>
             <span class="ml-3 font-medium">Dashboard</span>
         </a>
 
         <!-- Leads -->
-        <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+        <a href="{{url('leads')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-user-friends w-6 text-gray-400"></i>
             <span class="ml-3">Leads</span>
         </a>

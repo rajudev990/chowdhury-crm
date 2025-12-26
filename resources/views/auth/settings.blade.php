@@ -1,0 +1,73 @@
+@extends('layouts.app')
+@section('title','Profile Update')
+
+@section('content')
+<div class="container mx-auto mt-3">
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-xl border border-gray-200">
+        <h5 class="text-3xl font-semibold text-[#1A3A66] mb-6">Update Profile</h5>
+
+        <!-- Error messages -->
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Success message -->
+        @if (session('success'))
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- Profile Update Form -->
+        <form action="{{ route('profile.settings.update') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+
+            <!-- Name -->
+            <div class="mb-6">
+                <label for="name" class="block text-[#1A3A66] font-semibold mb-2">Name</label>
+                <input type="text" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3A66]" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-6">
+                <label for="email" class="block text-[#1A3A66] font-semibold mb-2">Email</label>
+                <input type="email" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3A66]" required>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-6">
+                <label for="phone" class="block text-[#1A3A66] font-semibold mb-2">Phone</label>
+                <input type="text" id="phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3A66]">
+            </div>
+
+            <!-- Profile Image -->
+            <div class="mb-6">
+                <label for="image" class="block text-[#1A3A66] font-semibold mb-2">Profile Image</label>
+                <input type="file" id="image" name="image" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3A66]">
+                @if(auth()->user()->image)
+                    <img src="{{ Storage::url(auth()->user()->image) }}" alt="Profile Image" class="mt-4 w-20 h-20 rounded-full">
+                @endif
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-6">
+                <button type="submit" 
+                    class="w-full px-4 py-3 bg-[#1A3A66] text-white rounded-lg hover:bg-[#1A3A66] transition duration-300 focus:outline-none focus:ring-2 focus:ring-[#1A3A66]">
+                    Update Profile
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeadsController;
+use App\Http\Controllers\LeadsController as ControllersLeadsController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\StatusController;
 
@@ -21,10 +22,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/settings', [HomeController::class, 'settings'])->name('profile.settings');
     Route::put('/profile/settings', [HomeController::class, 'updateSettings'])->name('profile.settings.update');
 
+    Route::get('/change-password', [HomeController::class, 'changePassword'])->name('change.password');
+    Route::put('/change-password', [HomeController::class, 'updatePassword'])->name('change.password.update');
+
 
 
     Route::resource('/sources', SourceController::class);
     Route::resource('/statuses', StatusController::class);
     Route::resource('/countries', CountryController::class);
-    Route::resource('/users', LeadsController::class);
+    Route::resource('/leads', LeadsController::class);
 });

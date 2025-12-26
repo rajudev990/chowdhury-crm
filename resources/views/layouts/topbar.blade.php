@@ -64,8 +64,7 @@
 
                         <ul class="py-2 text-sm text-gray-700">
                             <li>
-                                <a href="javascript:void(0)"
-                                onclick="openProfileSidebar()"
+                                <a href="{{route('profile.settings')}}"
                                 class="flex items-center px-4 py-2 hover:bg-gray-100">
                                     <i class="fas fa-user mr-3 text-gray-400"></i> My Profile
                                 </a>
@@ -73,8 +72,8 @@
 
 
                             <li>
-                                <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
-                                    <i class="fas fa-gear mr-3 text-gray-400"></i> Account Settings
+                                <a href="{{route('change.password')}}" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                                     <i class="fas fa-key mr-3 text-gray-400"></i>Change Password
                                 </a>
                             </li>
 
