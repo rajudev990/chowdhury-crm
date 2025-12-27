@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class StatusController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view status')->only('index');
+        $this->middleware('permission:create status')->only(['create', 'store']);
+        $this->middleware('permission:edit status')->only(['edit', 'update']);
+        $this->middleware('permission:delete status')->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      */

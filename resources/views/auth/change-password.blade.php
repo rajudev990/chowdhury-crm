@@ -3,8 +3,8 @@
 
 @section('content')
 <div class="container mx-auto mt-6">
-    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-xl border border-gray-200">
-        <h5 class="text-3xl font-semibold text-[#1A3A66] mb-6">Update Password</h5>
+    <div class="max-w-xl mx-auto bg-white rounded-lg shadow-xl border border-gray-200">
+        <h5 class="bg-[#1A3A66] font-semibold mb-6 p-2 text-xl text-white">Update Password</h5>
 
         <!-- Error messages from server -->
         @if ($errors->any())
@@ -24,7 +24,7 @@
             </div>
         @endif
 
-        <form action="{{ route('change.password.update') }}" method="POST" onsubmit="return validatePasswordForm()">
+        <form class="p-6" action="{{ route('change.password.update') }}" method="POST" onsubmit="return validatePasswordForm()">
             @csrf
             @method('PUT')
 

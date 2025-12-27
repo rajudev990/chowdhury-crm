@@ -316,24 +316,27 @@
             }
         });
 
-        // revinew dropdown 
-        const revenueBtn = document.getElementById("revenueBtn");
-        const revenueDropdown = document.getElementById("revenueDropdown");
-        const revenueArrow = document.getElementById("revenueArrow");
+       // Select all dropdowns
+        document.querySelectorAll('.dropdown-container').forEach(container => {
+            const btn = container.querySelector('.dropdown-btn');
+            const dropdown = container.querySelector('.dropdown-content');
+            const arrow = container.querySelector('.dropdown-arrow');
 
-        let isRevenueOpen = false;
+            let isOpen = false;
 
-        revenueBtn.addEventListener("click", () => {
-            isRevenueOpen = !isRevenueOpen;
+            btn.addEventListener('click', () => {
+                isOpen = !isOpen;
 
-            if (isRevenueOpen) {
-                revenueDropdown.style.maxHeight = revenueDropdown.scrollHeight + "px";
-                revenueArrow.classList.add("rotate-90");
-            } else {
-                revenueDropdown.style.maxHeight = "0";
-                revenueArrow.classList.remove("rotate-90");
-            }
+                if (isOpen) {
+                    dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+                    arrow.classList.add('rotate-90');
+                } else {
+                    dropdown.style.maxHeight = "0";
+                    arrow.classList.remove('rotate-90');
+                }
+            });
         });
+
 
 
         // new lead sizebar

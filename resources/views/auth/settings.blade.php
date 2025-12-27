@@ -3,8 +3,8 @@
 
 @section('content')
 <div class="container mx-auto mt-3">
-    <div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-xl border border-gray-200">
-        <h5 class="text-3xl font-semibold text-[#1A3A66] mb-6">Update Profile</h5>
+    <div class="max-w-xl mx-auto bg-white rounded-lg shadow-xl border border-gray-200">
+        <h5 class="bg-[#1A3A66] font-semibold mb-6 p-2 text-xl text-white">Update Profile</h5>
 
         <!-- Error messages -->
         @if ($errors->any())
@@ -25,7 +25,7 @@
         @endif
 
         <!-- Profile Update Form -->
-        <form action="{{ route('profile.settings.update') }}" method="POST" enctype="multipart/form-data">
+        <form class="p-6" action="{{ route('profile.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 

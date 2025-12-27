@@ -18,8 +18,8 @@
             <div>
                 @php
                 $hour = date('H'); // 24-hour format
-                if ($hour < 6) { $greeting='Good Morning' ; } elseif ($hour < 6) { $greeting='Good Afternoon' ; } else
-                    { $greeting='Good Evening' ; } @endphp <p class="text-sm text-gray-600">{{ $greeting }}</p>
+                if ($hour < 6) { $greeting='Good Morning' ; } elseif ($hour < 6) { $greeting='Good Afternoon' ; } else {
+                    $greeting='Good Evening' ; } @endphp <p class="text-sm text-gray-600">{{ $greeting }}</p>
                     <p class="text-sm font-medium text-gray-800">
                         {{ Auth::user()->name ?? 'Guest' }}
                     </p>
@@ -42,7 +42,8 @@
         </a>
 
         <!-- Customers -->
-        <a href="{{url('customers')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+        <a href="{{url('customers')}}"
+            class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-users w-6 text-gray-400"></i>
             <span class="ml-3">Customers</span>
         </a>
@@ -73,7 +74,79 @@
             <i class="fas fa-receipt w-6 text-gray-400"></i>
             <span class="ml-3">Expenses</span>
         </a>
+
+
+        <!-- Setup -->
+        <!-- Parent Button Wrapper -->
+        <div class="dropdown-container">
+
+            <!-- Parent Button -->
+            <button
+                class="dropdown-btn w-full flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-gray-50 transition">
+                <div class="flex items-center">
+                    <i class="fas fa-users w-6 text-gray-400"></i>
+                    <span class="ml-3">User Management</span>
+                </div>
+                <i class="dropdown-arrow fas fa-chevron-right text-gray-400 text-xs transition-transform"></i>
+            </button>
+
+            <!-- Dropdown / Sub Menu -->
+            <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
+                @can('view role')
+                <a href="{{ route('roles.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Role
+                </a>
+                @endcan
+                @can('view permission')
+                <a href="{{ route('permissions.index') }}"
+                    class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Permission
+                </a>
+                @endcan
+                @can('view user')
+                <a href="{{ route('users.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Staff
+                </a>
+                @endcan
+            </div>
+        </div>
+
+
+        <div class="dropdown-container">
+
+            <!-- Parent Button -->
+            <button
+                class="dropdown-btn w-full flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-gray-50 transition">
+                <div class="flex items-center">
+                    <i class="fas fa-cog w-6 text-gray-400"></i>
+                    <span class="ml-3">Setup</span>
+                </div>
+                <i class="dropdown-arrow fas fa-chevron-right text-gray-400 text-xs transition-transform"></i>
+            </button>
+
+            <!-- Dropdown / Sub Menu -->
+            <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
+                <a href="{{ route('countries.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Country
+                </a>
+
+                <a href="{{ route('statuses.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Status
+                </a>
+
+                <a href="{{ route('sources.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Source
+                </a>
+
+                <a href="#" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    Settings
+                </a>
+            </div>
+        </div>
+
+
     </nav>
+
 </aside>
 
 
