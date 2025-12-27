@@ -72,7 +72,7 @@
         </a>
 
         <!-- Expenses -->
-        <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+        <a href="{{route('expenses.index')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-receipt w-6"></i>
             <span class="ml-3">Expenses</span>
         </a>

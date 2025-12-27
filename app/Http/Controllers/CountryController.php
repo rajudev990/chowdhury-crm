@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 
 class CountryController extends Controller
 {
-
-    public function __construct()
+     public function __construct()
     {
         $this->middleware('permission:view country')->only('index');
         $this->middleware('permission:create country')->only(['create', 'store']);

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\PermissionController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\SourceController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserNoteController;
+use App\Models\Expense;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'loginForm'])->name('login.form');
@@ -41,7 +43,8 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::resource('/sources', SourceController::class);
     Route::resource('/statuses', StatusController::class);
     Route::resource('/countries', CountryController::class);
-
+    Route::resource('/expenses', ExpenseController::class);
+    
 
     Route::resource('leads', LeadsController::class);
     Route::post('/users/update-date/{user}', [LeadsController::class, 'updateDate']);
