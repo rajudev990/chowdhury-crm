@@ -19,73 +19,73 @@ class SourceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index()
     {
-        $data = Source::latest()->get();
-        return view('sources.index', compact('data'));
+        $sources = Source::latest()->paginate(10);
+        return view('setup.sources.index', compact('sources'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show create source form
      */
-    public function create() {}
+    public function create()
+    {
+        return view('setup.sources.create');
+    }
 
     /**
-     * Store a newly created resource in storage.
+     * Store new source
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sources',
+        $request->validate([
+            'name' => 'required|unique:sources,name|max:255',
         ]);
 
-        $validated['status'] = $request->has('status') ? 1 : 0;
+        Source::create([
+            'name' => $request->name,
+            'status' => $request->has('status') ? 1 : 0,
+        ]);
 
-        Source::create($validated);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
-
-        return redirect()->route('sources.index')->with('success', 'Source created successfully!');
+        return redirect()
+            ->route('sources.index')
+            ->with('success', 'Source created successfully');
     }
 
     /**
-     * Display the specified resource.
+     * Show edit source form
      */
-    public function show(Source $source) {}
+    public function edit(Source $source)
+    {
+        return view('setup.sources.create', compact('source'));
+    }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Source $source) {}
-
-    /**
-     * Update the specified resource in storage.
+     * Update source
      */
     public function update(Request $request, Source $source)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sources,name,' . $source->id,
+        $request->validate([
+            'name' => 'required|unique:sources,name,' . $source->id . '|max:255',
         ]);
 
-        $validated['status'] = $request->has('status') ? 1 : 0;
+        $source->update([
+            'name' => $request->name,
+           'status' => $request->has('status') ? 1 : 0,
+        ]);
 
-        $source->update($validated);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
-
-        return redirect()->route('sources.index')->with('success', 'Source updated successfully!');
+        return redirect()
+            ->route('sources.index')
+            ->with('success', 'Source updated successfully');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete source
      */
     public function destroy(Source $source)
     {
         $source->delete();
-        return redirect()->back()->with('success', 'Source deleted successfully!');
+
+        return back()->with('success', 'Source deleted successfully');
     }
 }

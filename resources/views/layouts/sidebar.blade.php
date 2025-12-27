@@ -94,17 +94,19 @@
             <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
                 @can('view role')
                 <a href="{{ route('roles.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    Role
+                    <i class="fas fa-user-shield mr-2 text-gray-400"></i>Role
                 </a>
                 @endcan
                 @can('view permission')
                 <a href="{{ route('permissions.index') }}"
                     class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-key mr-2 text-gray-400"></i>
                     Permission
                 </a>
                 @endcan
                 @can('view user')
                 <a href="{{ route('users.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-users mr-2 text-gray-400"></i>
                     Staff
                 </a>
                 @endcan
@@ -127,19 +129,19 @@
             <!-- Dropdown / Sub Menu -->
             <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
                 <a href="{{ route('countries.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    Country
+                    <i class="fas fa-globe mr-2 text-gray-400"></i>Country
                 </a>
 
                 <a href="{{ route('statuses.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    Status
+                    <i class="fas fa-check-circle mr-2 text-gray-400"></i>Status
                 </a>
 
                 <a href="{{ route('sources.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    Source
+                    <i class="fas fa-link mr-2 text-gray-400"></i>Source
                 </a>
 
-                <a href="#" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    Settings
+                <a href="{{ route('settings.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-sliders-h mr-2 text-gray-400"></i>Settings
                 </a>
             </div>
         </div>

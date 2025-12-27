@@ -20,82 +20,71 @@ class StatusController extends Controller
      */
     public function index()
     {
-        $data = Status::latest()->get();
-        return view('statuses.index', compact('data'));
+        $statuses = Status::latest()->paginate(10);
+        return view('setup.statuses.index', compact('statuses'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show create status form
      */
     public function create()
     {
-        
+        return view('setup.statuses.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store new status
      */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:statuses,name',
-            'status' => 'nullable|boolean',
+            'name' => 'required|unique:statuses,name|max:255',
         ]);
 
         Status::create([
             'name' => $request->name,
-            'status' => $request->has('status') ? 1 : 0,
+            'status' => $request->has('status') ? 1 : 0, // checkbox checked hole 1, na hole 0
         ]);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
-
-        return redirect()->back()->with('success', 'Status created successfully!');
+        return redirect()
+            ->route('statuses.index')
+            ->with('success', 'Status created successfully');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Status $status)
-    {
-        
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Show edit status form
      */
     public function edit(Status $status)
     {
-    
+        return view('setup.statuses.create', compact('status'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update status
      */
     public function update(Request $request, Status $status)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:statuses,name,' . $status->id,
+        $request->validate([
+            'name' => 'required|unique:statuses,name,' . $status->id . '|max:255',
         ]);
 
-        $validated['status'] = $request->has('status') ? 1 : 0;
+        $status->update([
+            'name' => $request->name,
+            'status' => $request->has('status') ? 1 : 0, // checkbox checked hole 1, na hole 0
+        ]);
 
-        $status->update($validated);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
-
-        return redirect()->route('statuses.index')->with('success', 'Status updated successfully!');
+        return redirect()
+            ->route('statuses.index')
+            ->with('success', 'Status updated successfully');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete status
      */
     public function destroy(Status $status)
     {
         $status->delete();
-        return redirect()->back()->with('success', 'Status deleted successfully!');
+
+        return back()->with('success', 'Status deleted successfully');
     }
 }

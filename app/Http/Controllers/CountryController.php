@@ -21,73 +21,71 @@ class CountryController extends Controller
      */
     public function index()
     {
-        $data = Country::latest()->get();
-        return view('countries.index', compact('data'));
+        $countries = Country::latest()->paginate(10);
+        return view('setup.countries.index', compact('countries'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show create country form
      */
     public function create()
     {
-     
+        return view('setup.countries.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store new country
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255|unique:countries',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|unique:countries,name|max:255',
+        ]);
 
-    // checkbox status handle
-    $validated['status'] = $request->has('status') ? 1 : 0;
+        Country::create([
+            'name' => $request->name,
+            'status' => $request->has('status') ? 1 : 0,
+        ]);
 
-    Country::create($validated);
-
-    // AJAX response
-    if ($request->ajax()) {
-        return response()->json(['success' => true]);
+        return redirect()
+            ->route('countries.index')
+            ->with('success', 'Country created successfully');
     }
 
-    return redirect()->route('countries.index')
-        ->with('success', 'Country created successfully!');
-}
-
-
-/**
- * Update the specified resource
- */
-public function update(Request $request, Country $country)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255|unique:countries,name,' . $country->id,
-    ]);
-
-    // checkbox status handle
-    $validated['status'] = $request->has('status') ? 1 : 0;
-
-    $country->update($validated);
-
-    // AJAX response
-    if ($request->ajax()) {
-        return response()->json(['success' => true]);
+    /**
+     * Show edit country form
+     */
+    public function edit(Country $country)
+    {
+        return view('setup.countries.create', compact('country'));
     }
 
-    return redirect()->route('countries.index')->with('success', 'Country updated successfully!');
-}
+    /**
+     * Update country
+     */
+    public function update(Request $request, Country $country)
+    {
+        $request->validate([
+            'name' => 'required|unique:countries,name,' . $country->id . '|max:255',
+        ]);
 
+        $country->update([
+            'name' => $request->name,
+            'status' => $request->has('status') ? 1 : 0,
+        ]);
 
-/**
- * Remove the specified resource
- */
-public function destroy(Country $country)
-{
-    $country->delete();
+        return redirect()
+            ->route('countries.index')
+            ->with('success', 'Country updated successfully');
+    }
 
-    return redirect()->back()->with('success', 'Country deleted successfully!');
-}
+    /**
+     * Delete country
+     */
+    public function destroy(Country $country)
+    {
+        $country->delete();
 
+        return back()->with('success', 'Country deleted successfully');
+    }
 }
