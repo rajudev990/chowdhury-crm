@@ -59,7 +59,7 @@
 
 
 
-        <!-- Leave Request -->
+        {{-- <!-- Leave Request -->
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-person-walking w-6"></i>
             <span class="ml-3">Leave Request</span>
@@ -69,7 +69,7 @@
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-file-lines w-6"></i>
             <span class="ml-3">Payroll</span>
-        </a>
+        </a> --}}
 
         <!-- Expenses -->
         <a href="{{route('expenses.index')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Setting;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,6 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+       // Create default setting
+        Setting::firstOrCreate([
+            'logo' => ''
+        ]);
+
         $permissions = [
             'view role','create role','edit role','delete role',
             'view permission','create permission','edit permission','delete permission',
