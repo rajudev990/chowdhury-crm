@@ -161,8 +161,9 @@ class LeadsController extends Controller
 
         return view('leads.create', compact('lead','status','source','country','users','jobExperiences','englishTests','exams'));
     }
-    public function show(User $lead)
+    public function show($id)
     {
+        $lead = User::findOrFail($id);
         $status = Status::where('status', 1)->get();
         $source = Source::where('status', 1)->get();
         $country = Country::where('status', 1)->get();

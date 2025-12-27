@@ -182,7 +182,7 @@
                     <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $item->source->name }}</td>
                     <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap">
                         <div class="flex">
-                            <a href="{{ route('leads.show', $item->id) }}" class="w-8 h-8 flex items-center justify-center
+                            <a href="{{ route('leads-show', $item->id) }}" class="w-8 h-8 flex items-center justify-center
                                         text-[#9CA3AF] rounded-full
                                         hover:text-[#1A3A66] transition" title="Details">
                                 <i class="fas fa-sliders-h mr-2 text-gray-400"></i>
@@ -220,33 +220,41 @@
 {{-- Notes --}}
 <!-- Notes Modal -->
 <div id="notesModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white w-full max-w-lg rounded-lg shadow-lg relative">
+    <div class="bg-white w-full max-w-3xl rounded-lg shadow-lg relative flex flex-col max-h-[90vh]">
 
         <!-- Header -->
-        <div class="flex justify-between items-center px-4 py-2 bg-[#1A3A66] text-white">
-            <h4 class="font-semibold">Customer Notes</h4>
-            <button id="closeNotesModal">&times;</button>
+        <div class="flex justify-between items-center px-6 py-3 bg-[#1A3A66] text-white rounded-t-lg flex-shrink-0">
+            <h4 class="font-semibold text-lg">Customer Notes</h4>
+            <button id="closeNotesModal" class="text-white text-2xl font-bold">&times;</button>
         </div>
 
         <!-- Body -->
-        <div class="p-4">
+        <div class="p-6 flex flex-col flex-1 overflow-hidden">
             <input type="hidden" id="noteUserId">
             <input type="hidden" id="noteId">
 
-            <textarea rows="5" cols="5" id="noteText" class="w-full border rounded p-2"
-                placeholder="Write note..."></textarea>
-            <p class="text-red-500 text-sm mt-1 hidden" id="noteError"></p>
+            <!-- Input area -->
+            <div class="flex flex-col mb-4 flex-shrink-0">
+                <textarea rows="5" id="noteText" 
+                    class="w-full border rounded p-3 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Write note..."></textarea>
+                <p class="text-red-500 text-sm mt-1 hidden" id="noteError"></p>
 
-            <button id="saveNote" class="mt-3 bg-[#1A3A66] text-white px-4 py-2 rounded">
-                Save Note
-            </button>
+                <button id="saveNote" class="mt-2 bg-[#1A3A66] text-white px-5 py-2 rounded hover:bg-[#163258] transition">
+                    Save Note
+                </button>
+            </div>
 
-            <hr class="my-4">
+            <hr class="my-4 flex-shrink-0">
 
-            <div id="notesList" class="space-y-2"></div>
+            <!-- Notes List -->
+            <div id="notesList" class="space-y-4 overflow-y-auto flex-1 pr-2">
+                <!-- Notes will be appended here -->
+            </div>
         </div>
     </div>
 </div>
+
 
 
 
@@ -306,10 +314,10 @@
 
 {{-- UserNotes --}}
 <script>
-    let modal = $('#notesModal');
+let modal = $('#notesModal');
 
 // OPEN MODAL
-$('.open-notes').click(function(){
+$(document).on('click', '.open-notes', function(){
     let userId = $(this).data('user-id');
     $('#noteUserId').val(userId);
     $('#noteId').val('');
@@ -328,20 +336,44 @@ function loadNotes(userId){
     $.get(`/users/${userId}/notes`, function(notes){
         let html = '';
         notes.forEach(n=>{
+            const createdAt = new Date(n.created_at);
+            const formattedDate = createdAt.toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+
             html += `
-            <div class="border p-2 rounded flex justify-between items-center">
-                <span class="note-text">${n.note}</span>
-                <div>
-                    <button class="edit-note text-blue-500" data-id="${n.id}" data-note="${n.note}"><i class="fa-solid fa-pen"></i></button>
-                    <button class="delete-note text-red-500 ml-2" data-id="${n.id}"><i class="fa-solid fa-trash"></i></button>
+            <div class="flex border-l-4 border-yellow-400 bg-yellow-50 rounded p-4 shadow-sm justify-between items-start">
+                <!-- Left: Avatar and Note -->
+                <div class="flex gap-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center font-semibold">
+                            ${n.user?.name ? n.user.name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 mb-1">${n.note}</p>
+                        <span class="text-gray-500 text-xs">${formattedDate}</span>
+                    </div>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex-shrink-0 flex gap-2 mt-1">
+                    <button class="edit-note text-blue-500" data-id="${n.id}" data-note="${n.note}">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete-note text-red-500" data-id="${n.id}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </div>
             </div>`;
         });
+
         $('#notesList').html(html);
     });
 }
 
-// STORE / UPDATE
+// STORE / UPDATE NOTE
 $('#saveNote').click(function(){
     let userId = $('#noteUserId').val();
     let noteId = $('#noteId').val();
@@ -367,7 +399,7 @@ $('#saveNote').click(function(){
             loadNotes(userId);
         },
         error(xhr){
-            $('#noteError').removeClass('hidden').text(xhr.responseJSON.message);
+            $('#noteError').removeClass('hidden').text(xhr.responseJSON.errors?.note[0] ?? 'Error saving note');
         }
     });
 });

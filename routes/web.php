@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
@@ -48,12 +49,19 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
 
     Route::resource('leads', LeadsController::class);
     Route::post('/users/update-date/{user}', [LeadsController::class, 'updateDate']);
+    Route::get('/customers/details/{id}', [LeadsController::class, 'show'])->name('leads-show');
 
 
     Route::get('/users/{user}/notes', [UserNoteController::class,'index']);
     Route::post('/users/{user}/notes', [UserNoteController::class,'store']);
     Route::put('/notes/{note}', [UserNoteController::class,'update']);
     Route::delete('/notes/{note}', [UserNoteController::class,'destroy']);
+
+    Route::prefix('attachments')->group(function(){
+        Route::post('/', [AttachmentController::class,'store'])->name('attachments.store');
+        Route::put('/{attachment}', [AttachmentController::class,'update'])->name('attachments.update');
+        Route::delete('/{attachment}', [AttachmentController::class,'destroy'])->name('attachments.destroy');
+    });
 
 
 
