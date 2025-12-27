@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class LeadsController extends Controller
+class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class LeadsController extends Controller
     public function index()
     {
         $data = User::with(['jobexpriences', 'englishlanguages', 'examtypes', 'status', 'source'])
-            ->where('type', 'user')->whereHas('status', function ($query) {
+            ->where('type', 'customer')->whereHas('status', function ($query) {
                 $query->where('status', 1);
             })
             ->latest()
@@ -30,7 +30,7 @@ class LeadsController extends Controller
         $source = Source::where('status', 1)->get();
         $country = Country::where('status', 1)->get();
 
-        return view('users.index', compact('data', 'status', 'source', 'country'));
+        return view('coustomer.index', compact('data', 'status', 'source', 'country'));
     }
 
     /**
@@ -211,6 +211,8 @@ class LeadsController extends Controller
                 'file' => $e->getFile()
             ], 500);
         }
+
+       return redirect()->route('customers.index')->with('success', 'Customer Created successfully!');
     }
 
     /**
@@ -379,6 +381,8 @@ class LeadsController extends Controller
                 'file' => $e->getFile()
             ], 500);
         }
+
+        return redirect()->route('customers.index')->with('success', 'Customer Created successfully!');
     }
 
     /**
@@ -401,16 +405,17 @@ class LeadsController extends Controller
 
             DB::commit();
 
-            return redirect()->route('leads.index')
+            return redirect()->route('customers.index')
                 ->with('success', 'Lead deleted successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Lead Delete Error: ' . $e->getMessage());
 
-            return redirect()->route('leads.index')
+            return redirect()->route('customers.index')
                 ->with('error', 'Error deleting lead: ' . $e->getMessage());
         }
     }
+
 
 
 

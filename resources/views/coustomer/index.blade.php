@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title','Leads Managment')
+@section('title','Customer Managment')
 
 @section('css')
 <style>
@@ -108,7 +108,7 @@
                     <button type="button" onclick="openStatusSidebar()"
                         class="inline-flex items-center gap-2 px-5 py-2 border border-[#1A3A66] text-[#1A3A66] rounded-lg hover:bg-[#1A3A66] hover:text-white transition duration-300">
                         <span class="text-xl">+</span>
-                        New Leads
+                        New Customer
                     </button>
                 </div>
 
@@ -174,7 +174,7 @@
                                             title="Edit">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
-                                        <form action="{{ route('leads.destroy', $item->id) }}" method="POST"
+                                        <form action="{{ route('customers.destroy', $item->id) }}" method="POST"
                                             onsubmit="return confirm('Are you sure you want to delete this lead?');">
                                             @csrf
                                             @method('DELETE')
@@ -190,7 +190,7 @@
                             @empty
                             <tr>
                                 <td colspan="10" class="px-6 py-8 text-center text-gray-500">
-                                    No leads found. Click "New Leads" to add one.
+                                    No Customer found. Click "New Customer" to add one.
                                 </td>
                             </tr>
                             @endforelse
@@ -209,11 +209,11 @@
                     <!-- Header -->
                     <div class="flex items-center gap-3 px-5 py-4 bg-[#1A3A66] text-white">
                         <button type="button" onclick="closeStatusSidebar()">←</button>
-                        <h2 class="text-lg font-semibold" id="sidebarTitle">Add Lead Managment</h2>
+                        <h2 class="text-lg font-semibold" id="sidebarTitle">Add Customer Managment</h2>
                     </div>
 
                     <!-- Form -->
-                    <form id="userForm" method="POST" action="{{ route('leads.store') }}" class="p-6 space-y-6">
+                    <form id="userForm" method="POST" action="{{ route('customers.store') }}" class="p-6 space-y-6">
                         @csrf
                         <input type="hidden" name="_method" id="formMethod" value="POST">
 
@@ -402,6 +402,7 @@
                 </div>
 
 
+
                 <!-- Type Change Modal -->
                 <div id="typeChangeModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center" onclick="closeTypeChangeModal()">
                     <div class="bg-white rounded-xl shadow-2xl p-6 w-96 mx-4 transform transition-all" onclick="event.stopPropagation()">
@@ -467,7 +468,6 @@
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -821,8 +821,8 @@
     function openStatusSidebar() {
         document.getElementById('statusOverlay').classList.remove('hidden');
         document.getElementById('statusSidebar').classList.remove('translate-x-full');
-        document.getElementById('sidebarTitle').textContent = 'Add Lead';
-        document.getElementById('userForm').action = '{{ route("leads.store") }}';
+        document.getElementById('sidebarTitle').textContent = 'Add Customer';
+        document.getElementById('userForm').action = '{{ route("customers.store") }}';
         document.getElementById('formMethod').value = 'POST';
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-save mr-2"></i> Submit';
 
@@ -855,8 +855,8 @@
         // Open sidebar
         document.getElementById('statusOverlay').classList.remove('hidden');
         document.getElementById('statusSidebar').classList.remove('translate-x-full');
-        document.getElementById('sidebarTitle').textContent = 'Edit Lead';
-        document.getElementById('userForm').action = `/leads/${id}`;
+        document.getElementById('sidebarTitle').textContent = 'Update Customer';
+        document.getElementById('userForm').action = `/customers/${id}`;
         document.getElementById('formMethod').value = 'PUT';
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-save mr-2"></i> Update';
 
@@ -887,7 +887,7 @@
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...';
 
         // Fetch user data
-        fetch(`/leads/${id}/edit`, {
+        fetch(`/customers/${id}/edit`, {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -1297,6 +1297,8 @@
     });
 </script>
 
+
+
 <script>
     function openTypeChangeModal(userId, currentType) {
         const modal = document.getElementById('typeChangeModal');
@@ -1304,7 +1306,7 @@
         const userInfo = document.getElementById('currentUserInfo');
 
         // Set form action - FIXED: Use correct route
-        form.action = `/leads/${userId}/change-type`;
+        form.action = `/customers/${userId}/change-type`;
 
         // Pre-select current type
         const radioButton = form.querySelector(`input[value="${currentType}"]`);
@@ -1358,18 +1360,18 @@
     // Add form submit handler with AJAX
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('typeChangeForm');
-
+        
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-
+            
             const formData = new FormData(form);
             const submitButton = form.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
-
+            
             // Disable button and show loading
             submitButton.disabled = true;
             submitButton.textContent = 'Updating...';
-
+            
             try {
                 const response = await fetch(form.action, {
                     method: 'POST',
@@ -1379,16 +1381,16 @@
                         'Accept': 'application/json'
                     }
                 });
-
+                
                 const data = await response.json();
-
+                
                 if (data.success) {
                     // Close modal immediately
                     closeTypeChangeModal();
-
+                    
                     // Show success message
                     alert('Type updated successfully!');
-
+                    
                     // Reload page to reflect changes
                     window.location.reload();
                 } else {

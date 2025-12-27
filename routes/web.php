@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeadsController;
 use App\Http\Controllers\LeadsController as ControllersLeadsController;
@@ -31,4 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('/statuses', StatusController::class);
     Route::resource('/countries', CountryController::class);
     Route::resource('/leads', LeadsController::class);
+    Route::patch('/leads/{id}/change-type', [LeadsController::class, 'changeType'])->name('leads.changeType');
+    
+    Route::resource('/customers', CustomerController::class);
+    Route::patch('/customers/{id}/change-type', [CustomerController::class, 'changeType'])->name('customers.changeType');
 });
