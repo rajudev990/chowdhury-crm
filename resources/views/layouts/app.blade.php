@@ -45,6 +45,10 @@
         .hidden {
             display: none;
         }
+        label{
+            font-weight: 400 !important;
+            font-size: 15px;
+        }
     </style>
     <!-- Tailwind config colour -->
     <script>
@@ -68,7 +72,7 @@
     @include('layouts.topbar')
 
     <!-- Main Content -->
-    <main id="mainContent" class="md:ml-64 mt-20 p-4 md:p-8 transition-all duration-300">
+    <main id="mainContent" class="md:ml-64 mt-20 p-3 transition-all duration-300">
 
         @yield('content')
 

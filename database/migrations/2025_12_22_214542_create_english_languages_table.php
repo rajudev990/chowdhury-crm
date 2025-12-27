@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('english_languages', function (Blueprint $table) {
             $table->id();
             $table->string('user_id')->nullable();
+            $table->string('test_type')->nullable();
             $table->string('duolingo')->nullable();
             $table->string('ielts_overall')->nullable();
             $table->string('ielts_listening')->nullable();

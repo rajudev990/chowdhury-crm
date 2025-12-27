@@ -40,7 +40,11 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::resource('/sources', SourceController::class);
     Route::resource('/statuses', StatusController::class);
     Route::resource('/countries', CountryController::class);
-    Route::resource('/leads', LeadsController::class);
+
+
+    Route::resource('leads', LeadsController::class);
+
+
     Route::patch('/leads/{id}/change-type', [LeadsController::class, 'changeType'])->name('leads.changeType');
 
 

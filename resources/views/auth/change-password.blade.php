@@ -68,8 +68,8 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="mt-6">
-                <button type="submit" class="w-full px-4 py-3 bg-[#1A3A66] text-white rounded-lg hover:bg-[#163158] transition duration-300 focus:outline-none focus:ring-2 focus:ring-[#1A3A66]">
+            <div class="mt-6 text-right">
+                <button type="submit" class="px-4 py-3 bg-[#1A3A66] text-white rounded-lg hover:bg-[#163158] transition duration-300 focus:outline-none focus:ring-2 focus:ring-[#1A3A66]">
                     Update Password
                 </button>
             </div>

@@ -36,10 +36,12 @@
         </a>
 
         <!-- Leads -->
+        @can('view leads')
         <a href="{{url('leads')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
             <i class="fas fa-user-friends w-6 text-gray-400"></i>
             <span class="ml-3">Leads</span>
         </a>
+        @endcan
 
         <!-- Customers -->
         <a href="{{url('customers')}}"

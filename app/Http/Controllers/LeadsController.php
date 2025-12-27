@@ -15,427 +15,200 @@ use Illuminate\Support\Facades\Log;
 
 class LeadsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    public function __construct()
+    {
+        $this->middleware('permission:view leads')->only('index','show');
+        $this->middleware('permission:create leads')->only(['create', 'store']);
+        $this->middleware('permission:edit leads')->only(['edit', 'update']);
+        $this->middleware('permission:delete leads')->only('destroy');
+    }
+
     public function index()
     {
-        $data = User::with(['jobexpriences', 'englishlanguages', 'examtypes', 'status', 'source'])
-            ->where('type', 'user')->whereHas('status', function ($query) {
-                $query->where('status', 1);
-            })
-            ->latest()
-            ->get();
         $status = Status::where('status', 1)->get();
         $source = Source::where('status', 1)->get();
         $country = Country::where('status', 1)->get();
+        $users = User::where('type','admin')->get();
+        $leads = User::where('type','leads')->latest()->get();
 
-        return view('users.index', compact('data', 'status', 'source', 'country'));
+        return view('leads.index', compact('status', 'source', 'country','users','leads'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    // Create page
+    public function create()
     {
-        try {
-            Log::info('Edit request for user ID: ' . $id);
+        $status = Status::where('status', 1)->get();
+        $source = Source::where('status', 1)->get();
+        $country = Country::where('status', 1)->get();
+        $users = User::where('type','admin')->get();
 
-            $user = User::with(['jobexpriences', 'englishlanguages', 'examtypes', 'status', 'source',])
-                ->findOrFail($id);
-
-            Log::info('User data found:', ['user_id' => $user->id, 'name' => $user->name]);
-
-            return response()->json([
-                'success' => true,
-                'user' => $user
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('User not found with ID: ' . $id);
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        } catch (\Exception $e) {
-            Log::error('Edit Error: ' . $e->getMessage());
-            Log::error('Stack Trace: ' . $e->getTraceAsString());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching user: ' . $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ], 500);
-        }
+        return view('leads.create', compact('status', 'source', 'country','users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Store lead
     public function store(Request $request)
     {
-        // Log incoming data for debugging
-        Log::info('Store Request Data:', $request->all());
-
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'required|string|max:20|unique:users,phone',
-            'status_id' => 'required',
-            'source_id' => 'required',
-            'assigned_id' => 'required',
-            'type' => 'required|in:admin,user,customer',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'required|string|max:20',
+            'additional_phone' => 'nullable|string|max:20',
+            'dob' => 'nullable|date',
+            'country' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'personal_information' => 'nullable|string',
+            'additional_information' => 'nullable|string',
+            'date_of_contact' => 'nullable|date',
+            'status_id' => 'nullable|integer',
+            'how_did_hear_about_us' => 'nullable|string',
+            'assigned_id' => 'nullable|integer',
         ]);
 
-        DB::beginTransaction();
-
-        try {
-            // Create Lead with proper null handling
+        DB::transaction(function () use ($request) {
             $lead = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'additional_phone' => $request->additional_phone,
                 'dob' => $request->dob,
-                'country' => $request->country ? (int)$request->country : null,
+                'country' => $request->country,
                 'city' => $request->city,
                 'address' => $request->address,
                 'personal_information' => $request->personal_information,
                 'additional_information' => $request->additional_information,
                 'date_of_contact' => $request->date_of_contact,
-                'status_id' => (int)$request->status_id,
-                'source_id' => (int)$request->source_id,
+                'status_id' => $request->status_id,
+                'source_id' => $request->source_id,
                 'how_did_hear_about_us' => $request->how_did_hear_about_us,
-                'preferred_country' => $request->preferred_country ? (int)$request->preferred_country : null,
-                'type' => $request->type, // এই লাইন যোগ করুন
                 'assigned_id' => $request->assigned_id,
+                'preferred_country' => $request->preferred_country,
+                'password' => bcrypt('password'),
+                'type' => 'leads',
             ]);
 
-            // Save Job Experiences
-            if ($request->has('job_experiences') && is_array($request->job_experiences)) {
-                foreach ($request->job_experiences as $experience) {
-                    // Check if at least one field has value
-                    $filtered = array_filter($experience, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        JobExprience::create([
-                            'user_id' => $lead->id,
-                            'company_name' => $experience['company_name'] ?? null,
-                            'job_title' => $experience['job_title'] ?? null,
-                            'duration' => $experience['duration'] ?? null,
-                            'joining_date' => !empty($experience['joining_date']) ? $experience['joining_date'] : null,
-                            'end_date' => !empty($experience['end_date']) ? $experience['end_date'] : null,
-                            'company_address' => $experience['company_address'] ?? null,
-                        ]);
-                    }
+            // Job Experience
+            if ($request->job_experience && is_array($request->job_experience)) {
+                foreach ($request->job_experience as $experience) {
+                    JobExprience::create(array_merge($experience, ['user_id' => $lead->id]));
                 }
             }
 
-            // Save English Language Tests
-            if ($request->has('english_language') && is_array($request->english_language)) {
-                foreach ($request->english_language as $test) {
-                    // Check if any field has value
-                    $filtered = array_filter($test, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        EnglishLanguage::create([
-                            'user_id' => $lead->id,
-                            'ielts_overall' => $test['ielts_overall'] ?? null,
-                            'ielts_listening' => $test['ielts_listening'] ?? null,
-                            'ielts_reading' => $test['ielts_reading'] ?? null,
-                            'ielts_writing' => $test['ielts_writing'] ?? null,
-                            'ielts_speaking' => $test['ielts_speaking'] ?? null,
-                            'pte_overall' => $test['pte_overall'] ?? null,
-                            'pte_listening' => $test['pte_listening'] ?? null,
-                            'pte_reading' => $test['pte_reading'] ?? null,
-                            'pte_writing' => $test['pte_writing'] ?? null,
-                            'pte_speaking' => $test['pte_speaking'] ?? null,
-                            'toefl' => $test['toefl'] ?? null,
-                            'duolingo' => $test['duolingo'] ?? null,
-                            'moi' => $test['moi'] ?? null,
-                            'oietc' => $test['oietc'] ?? null,
-                        ]);
-                    }
+            // English Language
+            if ($request->english_test && is_array($request->english_test)) {
+                foreach ($request->english_test as $test) {
+                    EnglishLanguage::create(array_merge($test, ['user_id' => $lead->id]));
                 }
             }
 
-            // Save Education/Exam Types
-            if ($request->has('exam_types') && is_array($request->exam_types)) {
-                foreach ($request->exam_types as $exam) {
-                    // Check if at least one field has value
-                    $filtered = array_filter($exam, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        ExamType::create([
-                            'user_id' => $lead->id,
-                            'exam_type' => $exam['exam_type'] ?? null,
-                            'institute_name' => $exam['institute_name'] ?? null,
-                            'major_subject' => $exam['major_subject'] ?? null,
-                            'result' => $exam['result'] ?? null,
-                            'passing_year' => $exam['passing_year'] ?? null,
-                            'country' => $exam['country'] ?? null,
-                        ]);
-                    }
+            // Exam Type
+            if ($request->exam && is_array($request->exam)) {
+                foreach ($request->exam as $exam) {
+                    ExamType::create(array_merge($exam, ['user_id' => $lead->id]));
                 }
             }
+        });
 
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Lead created successfully!',
-                'data' => $lead
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Lead Store Error: ' . $e->getMessage());
-            Log::error('Stack Trace: ' . $e->getTraceAsString());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating lead: ' . $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ], 500);
-        }
+        return redirect()->route('leads.index')->with('success', 'Lead created successfully');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
+    // Edit page
+    public function edit(User $lead)
     {
-        // Log incoming data for debugging
-        Log::info('Update Request Data for ID ' . $id . ':', $request->all());
+        $status = Status::where('status', 1)->get();
+        $source = Source::where('status', 1)->get();
+        $country = Country::where('status', 1)->get();
+        $users = User::where('type','admin')->get();
 
-        // Log only phone related fields
-        Log::info('Phone fields:', [
-            'phone' => $request->phone,
-            'additional_phone' => $request->additional_phone,
-        ]);
+        $jobExperiences = $lead->jobExperiences ?? [];
+        $englishTests = $lead->englishLanguages ?? [];
+        $exams = $lead->examTypes ?? [];
 
-        // Check for any unexpected phone fields
-        $allKeys = array_keys($request->all());
-        $phoneKeys = array_filter($allKeys, function ($key) {
-            return strpos($key, 'phone') !== false;
-        });
-        Log::info('All phone-related keys in request:', $phoneKeys);
+        return view('leads.create', compact('lead','status','source','country','users','jobExperiences','englishTests','exams'));
+    }
+    public function show(User $lead)
+    {
+        $status = Status::where('status', 1)->get();
+        $source = Source::where('status', 1)->get();
+        $country = Country::where('status', 1)->get();
+        $users = User::where('type','admin')->get();
 
-        $validated = $request->validate([
+        $jobExperiences = $lead->jobExperiences ?? [];
+        $englishTests = $lead->englishLanguages ?? [];
+        $exams = $lead->examTypes ?? [];
+
+        return view('leads.view', compact('lead','status','source','country','users','jobExperiences','englishTests','exams'));
+    }
+
+    // Update lead
+    public function update(Request $request, User $lead)
+    {
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'phone' => 'required|string|unique:users,phone,' . $id,
-            'status_id' => 'required',
-            'source_id' => 'required',
-            'assigned_id' => 'required',
-            'type' => 'required|in:admin,user,customer',
+            'email' => 'required|email|unique:users,email,' . $lead->id,
+            'phone' => 'required|string|max:20',
+            'additional_phone' => 'nullable|string|max:20',
+            'dob' => 'nullable|date',
+            'country' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'personal_information' => 'nullable|string',
+            'additional_information' => 'nullable|string',
+            'date_of_contact' => 'nullable|date',
+            'status_id' => 'nullable|integer',
+            'how_did_hear_about_us' => 'nullable|string',
+            'assigned_id' => 'nullable|integer',
         ]);
 
-        DB::beginTransaction();
-
-        try {
-            $lead = User::findOrFail($id);
-
-            // Update Lead with proper null handling - ONLY specified fields
-            $updateData = [
+        DB::transaction(function () use ($request, $lead) {
+            $lead->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'additional_phone' => $request->additional_phone,
                 'dob' => $request->dob,
-                'country' => $request->country ? (int)$request->country : null,
+                'country' => $request->country,
                 'city' => $request->city,
                 'address' => $request->address,
                 'personal_information' => $request->personal_information,
                 'additional_information' => $request->additional_information,
                 'date_of_contact' => $request->date_of_contact,
-                'status_id' => (int)$request->status_id,
-                'source_id' => (int)$request->source_id,
-                'type' => $request->type,
-                'assigned_id' => $request->assigned_id,
+                'status_id' => $request->status_id,
+                'source_id' => $request->source_id,
                 'how_did_hear_about_us' => $request->how_did_hear_about_us,
-                'preferred_country' => $request->preferred_country ? (int)$request->preferred_country : null,
-            ];
-
-            Log::info('Update data prepared:', $updateData);
-
-            $lead->update($updateData);
-
-            // Delete old related records
-            $lead->jobexpriences()->delete();
-            $lead->englishlanguages()->delete();
-            $lead->examtypes()->delete();
-
-            // Save Job Experiences
-            if ($request->has('job_experiences') && is_array($request->job_experiences)) {
-                foreach ($request->job_experiences as $experience) {
-                    // Check if at least one field has value
-                    $filtered = array_filter($experience, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        JobExprience::create([
-                            'user_id' => $lead->id,
-                            'company_name' => $experience['company_name'] ?? null,
-                            'job_title' => $experience['job_title'] ?? null,
-                            'duration' => $experience['duration'] ?? null,
-                            'joining_date' => !empty($experience['joining_date']) ? $experience['joining_date'] : null,
-                            'end_date' => !empty($experience['end_date']) ? $experience['end_date'] : null,
-                            'company_address' => $experience['company_address'] ?? null,
-                        ]);
-                    }
-                }
-            }
-
-            // Save English Language Tests
-            if ($request->has('english_language') && is_array($request->english_language)) {
-                foreach ($request->english_language as $test) {
-                    // Check if any field has value
-                    $filtered = array_filter($test, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        EnglishLanguage::create([
-                            'user_id' => $lead->id,
-                            'ielts_overall' => $test['ielts_overall'] ?? null,
-                            'ielts_listening' => $test['ielts_listening'] ?? null,
-                            'ielts_reading' => $test['ielts_reading'] ?? null,
-                            'ielts_writing' => $test['ielts_writing'] ?? null,
-                            'ielts_speaking' => $test['ielts_speaking'] ?? null,
-                            'pte_overall' => $test['pte_overall'] ?? null,
-                            'pte_listening' => $test['pte_listening'] ?? null,
-                            'pte_reading' => $test['pte_reading'] ?? null,
-                            'pte_writing' => $test['pte_writing'] ?? null,
-                            'pte_speaking' => $test['pte_speaking'] ?? null,
-                            'toefl' => $test['toefl'] ?? null,
-                            'duolingo' => $test['duolingo'] ?? null,
-                            'moi' => $test['moi'] ?? null,
-                            'oietc' => $test['oietc'] ?? null,
-                        ]);
-                    }
-                }
-            }
-
-            // Save Education/Exam Types
-            if ($request->has('exam_types') && is_array($request->exam_types)) {
-                foreach ($request->exam_types as $exam) {
-                    // Check if at least one field has value
-                    $filtered = array_filter($exam, function ($value) {
-                        return !is_null($value) && $value !== '';
-                    });
-
-                    if (!empty($filtered)) {
-                        ExamType::create([
-                            'user_id' => $lead->id,
-                            'exam_type' => $exam['exam_type'] ?? null,
-                            'institute_name' => $exam['institute_name'] ?? null,
-                            'major_subject' => $exam['major_subject'] ?? null,
-                            'result' => $exam['result'] ?? null,
-                            'passing_year' => $exam['passing_year'] ?? null,
-                            'country' => $exam['country'] ?? null,
-                        ]);
-                    }
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Lead updated successfully!',
-                'data' => $lead->fresh(['jobexpriences', 'englishlanguages', 'examtypes'])
+                'assigned_id' => $request->assigned_id,
+                'preferred_country' => $request->preferred_country,
+                'password' => bcrypt('password'),
+                'type' => 'leads',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Lead Update Error: ' . $e->getMessage());
-            Log::error('Stack Trace: ' . $e->getTraceAsString());
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating lead: ' . $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ], 500);
-        }
+            // Delete old related data and recreate
+            $lead->jobExperiences()->delete();
+            $lead->englishLanguages()->delete();
+            $lead->examTypes()->delete();
+
+            if ($request->job_experience) {
+                foreach ($request->job_experience as $experience) {
+                    JobExprience::create(array_merge($experience, ['user_id' => $lead->id]));
+                }
+            }
+
+            if ($request->english_test) {
+                foreach ($request->english_test as $test) {
+                    EnglishLanguage::create(array_merge($test, ['user_id' => $lead->id]));
+                }
+            }
+
+            if ($request->exam) {
+                foreach ($request->exam as $exam) {
+                    ExamType::create(array_merge($exam, ['user_id' => $lead->id]));
+                }
+            }
+        });
+
+        return redirect()->route('leads.index')->with('success', 'Lead updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        DB::beginTransaction();
-
-        try {
-            $user = User::findOrFail($id);
-
-            // Delete related records first
-            $user->jobexpriences()->delete();
-            $user->englishlanguages()->delete();
-            $user->examtypes()->delete();
-
-            // Delete the user
-            $user->delete();
-
-            DB::commit();
-
-            return redirect()->route('leads.index')
-                ->with('success', 'Lead deleted successfully!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Lead Delete Error: ' . $e->getMessage());
-
-            return redirect()->route('leads.index')
-                ->with('error', 'Error deleting lead: ' . $e->getMessage());
-        }
-    }
-
-
-
-
-    public function changeType(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'type' => 'required|in:admin,user,customer'
-        ]);
-
-        try {
-            $user = User::findOrFail($id);
-            $user->type = $request->type;
-            $user->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Type updated successfully!',
-                'data' => $user
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating type: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+  
 }

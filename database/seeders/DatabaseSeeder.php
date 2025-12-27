@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             'view source','create source','edit source','delete source',
             'view status','create status','edit status','delete status',
             'view setting','create setting','edit setting','delete setting',
+            'view leads','create leads','edit leads','delete leads',
         ];
 
         foreach ($permissions as $permission) {

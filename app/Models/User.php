@@ -57,15 +57,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Note::class);
     }
-    public function jobexpriences()
+    public function jobExperiences()
     {
         return $this->hasMany(JobExprience::class);
     }
-    public function examtypes()
+    public function examTypes()
     {
         return $this->hasMany(ExamType::class);
     }
-    public function englishlanguages()
+    public function englishLanguages()
     {
         return $this->hasMany(EnglishLanguage::class);
     }
