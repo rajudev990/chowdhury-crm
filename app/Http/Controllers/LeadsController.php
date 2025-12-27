@@ -24,16 +24,50 @@ class LeadsController extends Controller
         $this->middleware('permission:delete leads')->only('destroy');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $status = Status::where('status', 1)->get();
         $source = Source::where('status', 1)->get();
-        $country = Country::where('status', 1)->get();
         $users = User::where('type','admin')->get();
-        $leads = User::where('type','leads')->latest()->get();
 
-        return view('leads.index', compact('status', 'source', 'country','users','leads'));
+        $query = User::where('type', 'leads')->latest();
+
+        // Search
+        if($request->search){
+            $query->where(function($q) use ($request){
+                $q->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%")
+                ->orWhere('phone', 'like', "%{$request->search}%");
+            });
+        }
+
+        // Filters
+        if($request->status){
+            $query->where('status_id', $request->status);
+        }
+
+        if($request->source){
+            $query->where('source_id', $request->source);
+        }
+
+        if($request->assigned){
+            $query->where('assigned_id', $request->assigned);
+        }
+
+        if($request->followup_date){
+            $query->whereDate('follow_up_date', $request->followup_date);
+        }
+
+        if($request->appointment_date){
+            $query->whereDate('appointment_date', $request->appointment_date);
+        }
+
+        $leads = $query->paginate(10)->withQueryString(); // preserves filter values in pagination
+
+        return view('leads.index', compact('status', 'source', 'users', 'leads'));
     }
+
+
 
     // Create page
     public function create()
@@ -209,6 +243,25 @@ class LeadsController extends Controller
 
         return redirect()->route('leads.index')->with('success', 'Lead updated successfully');
     }
+
+
+    // Update Date
+    public function updateDate(Request $request, User $user)
+    {
+        $request->validate([
+            'field' => 'required|in:appointment_date,follow_up_date',
+            'value' => 'nullable|date'
+        ]);
+
+        $user->{$request->field} = $request->value;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead updated successfully'
+        ]);
+    }
+
 
   
 }

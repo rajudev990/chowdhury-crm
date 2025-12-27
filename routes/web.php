@@ -13,6 +13,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserNoteController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'loginForm'])->name('login.form');
@@ -43,6 +44,16 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
 
 
     Route::resource('leads', LeadsController::class);
+    Route::post('/users/update-date/{user}', [LeadsController::class, 'updateDate']);
+
+
+    Route::get('/users/{user}/notes', [UserNoteController::class,'index']);
+    Route::post('/users/{user}/notes', [UserNoteController::class,'store']);
+    Route::put('/notes/{note}', [UserNoteController::class,'update']);
+    Route::delete('/notes/{note}', [UserNoteController::class,'destroy']);
+
+
+
 
 
     Route::patch('/leads/{id}/change-type', [LeadsController::class, 'changeType'])->name('leads.changeType');

@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany(CourseType::class);
     }
 
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_id');
+    }
+
 
 
     public function country()

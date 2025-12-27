@@ -247,8 +247,8 @@ function addJobExperience(data = {}) {
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
             <input type="text" name="job_experience[${jobCount}][duration]" placeholder="Duration" value="${data.duration || ''}" class="border px-3 py-2 rounded w-full">
-            <input type="date" name="job_experience[${jobCount}][joining_date]" placeholder="Joining Date" value="${data.joining_date || ''}" class="border px-3 py-2 rounded w-full">
-            <input type="date" name="job_experience[${jobCount}][end_date]" placeholder="End Date" value="${data.end_date || ''}" class="border px-3 py-2 rounded w-full">
+            <input onfocus="this.type='date'" type="text" name="job_experience[${jobCount}][joining_date]" placeholder="Joining Date" value="${data.joining_date || ''}" class="border px-3 py-2 rounded w-full">
+            <input onfocus="this.type='date'" type="text" name="job_experience[${jobCount}][end_date]" placeholder="End Date" value="${data.end_date || ''}" class="border px-3 py-2 rounded w-full">
         </div>
         <textarea name="job_experience[${jobCount}][company_address]" placeholder="Company Address" class="border px-3 py-2 rounded w-full">${data.company_address || ''}</textarea>
     </div>`;

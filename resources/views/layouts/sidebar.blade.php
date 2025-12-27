@@ -30,15 +30,15 @@
     <!-- Navigation Links -->
     <nav class="py-4">
         <!-- Dashboard - Active State -->
-        <a href="/" class="flex items-center px-6 py-3 bg-primary text-white">
+        <a href="/" class="flex items-center px-6 py-3 transition-colors {{ Route::is('dashboard') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50' }}">
             <i class="fas fa-th-large w-6"></i>
             <span class="ml-3 font-medium">Dashboard</span>
         </a>
 
         <!-- Leads -->
         @can('view leads')
-        <a href="{{url('leads')}}" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-user-friends w-6 text-gray-400"></i>
+        <a href="{{url('leads')}}" class="flex items-center px-6 py-3 transition-colors {{ Route::is('leads.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50' }}">
+            <i class="fas fa-user-friends w-6"></i>
             <span class="ml-3">Leads</span>
         </a>
         @endcan
@@ -46,13 +46,13 @@
         <!-- Customers -->
         <a href="{{url('customers')}}"
             class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-users w-6 text-gray-400"></i>
+            <i class="fas fa-users w-6"></i>
             <span class="ml-3">Customers</span>
         </a>
 
         <!-- Projects -->
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-chart-bar w-6 text-gray-400"></i>
+            <i class="fas fa-chart-bar w-6"></i>
             <span class="ml-3">Projects</span>
         </a>
 
@@ -61,19 +61,19 @@
 
         <!-- Leave Request -->
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-person-walking w-6 text-gray-400"></i>
+            <i class="fas fa-person-walking w-6"></i>
             <span class="ml-3">Leave Request</span>
         </a>
 
         <!-- Payroll -->
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-file-lines w-6 text-gray-400"></i>
+            <i class="fas fa-file-lines w-6"></i>
             <span class="ml-3">Payroll</span>
         </a>
 
         <!-- Expenses -->
         <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-            <i class="fas fa-receipt w-6 text-gray-400"></i>
+            <i class="fas fa-receipt w-6"></i>
             <span class="ml-3">Expenses</span>
         </a>
 
@@ -86,29 +86,29 @@
             <button
                 class="dropdown-btn w-full flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-gray-50 transition">
                 <div class="flex items-center">
-                    <i class="fas fa-users w-6 text-gray-400"></i>
+                    <i class="fas fa-users w-6"></i>
                     <span class="ml-3">User Management</span>
                 </div>
-                <i class="dropdown-arrow fas fa-chevron-right text-gray-400 text-xs transition-transform"></i>
+                <i class="dropdown-arrow fas fa-chevron-right text-xs transition-transform"></i>
             </button>
 
             <!-- Dropdown / Sub Menu -->
             <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
                 @can('view role')
                 <a href="{{ route('roles.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-user-shield mr-2 text-gray-400"></i>Role
+                    <i class="fas fa-user-shield mr-2"></i>Role
                 </a>
                 @endcan
                 @can('view permission')
                 <a href="{{ route('permissions.index') }}"
                     class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-key mr-2 text-gray-400"></i>
+                    <i class="fas fa-key mr-2"></i>
                     Permission
                 </a>
                 @endcan
                 @can('view user')
                 <a href="{{ route('users.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-users mr-2 text-gray-400"></i>
+                    <i class="fas fa-users mr-2"></i>
                     Staff
                 </a>
                 @endcan
@@ -122,28 +122,28 @@
             <button
                 class="dropdown-btn w-full flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-gray-50 transition">
                 <div class="flex items-center">
-                    <i class="fas fa-cog w-6 text-gray-400"></i>
+                    <i class="fas fa-cog w-6"></i>
                     <span class="ml-3">Setup</span>
                 </div>
-                <i class="dropdown-arrow fas fa-chevron-right text-gray-400 text-xs transition-transform"></i>
+                <i class="dropdown-arrow fas fa-chevron-right text-xs transition-transform"></i>
             </button>
 
             <!-- Dropdown / Sub Menu -->
             <div class="dropdown-content max-h-0 overflow-hidden transition-all duration-300">
                 <a href="{{ route('countries.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-globe mr-2 text-gray-400"></i>Country
+                    <i class="fas fa-globe mr-2"></i>Country
                 </a>
 
                 <a href="{{ route('statuses.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-check-circle mr-2 text-gray-400"></i>Status
+                    <i class="fas fa-check-circle mr-2"></i>Status
                 </a>
 
                 <a href="{{ route('sources.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-link mr-2 text-gray-400"></i>Source
+                    <i class="fas fa-link mr-2"></i>Source
                 </a>
 
                 <a href="{{ route('settings.index') }}" class="block px-14 py-2 text-sm text-gray-600 hover:bg-gray-50">
-                    <i class="fas fa-sliders-h mr-2 text-gray-400"></i>Settings
+                    <i class="fas fa-sliders-h mr-2"></i>Settings
                 </a>
             </div>
         </div>

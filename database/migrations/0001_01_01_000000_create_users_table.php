@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('password');
             $table->string('type')->default('user');
             $table->string('image')->nullable();
+            $table->string('appointment_date')->nullable();
+            $table->string('follow_up_date')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -239,6 +239,11 @@
         </div>
     </div>
 
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
     <script>
         const menuBtn = document.getElementById("menuBtn");
         const sidebar = document.getElementById("sidebar");
